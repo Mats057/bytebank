@@ -1,6 +1,7 @@
-import Conta from "../types/conta.js";
+import Conta from "../types/Conta.js";
 import { TipoTransacao } from "../types/TipoTransacao.js";
 import { Transacao } from "../types/Transacao.js";
+import ExtratoComponent from "./extrato-component.js";
 import SaldoComponent from "./saldo-component.js";
 
 const form = document.querySelector(".block-nova-transacao form") as HTMLFormElement;
@@ -9,18 +10,24 @@ const inputData = form.querySelector("#data") as HTMLInputElement;
 const inputValor = form.querySelector("#valor") as HTMLInputElement;
 
 form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  if (!form.checkValidity()) {
-    alert("Preencha todos os campos");
-    return;
+  try{
+    e.preventDefault();
+    if (!form.checkValidity()) {
+      alert("Preencha todos os campos");
+      return;
+    }
+  
+    const novaTransacao:Transacao = {
+      tipo: inputTipoTransacao.value as TipoTransacao,
+      valor: parseFloat(inputValor.value),
+      data: new Date(inputData.value + " 00:00:00"),
+    };
+    Conta.registrarTransacao(novaTransacao);
+    SaldoComponent.atualizar();
+    ExtratoComponent.atualizar();
+    form.reset();
   }
-
-  const novaTransacao:Transacao = {
-    tipo: inputTipoTransacao.value as TipoTransacao,
-    valor: parseFloat(inputValor.value),
-    data: new Date(inputData.value),
-  };
-  Conta.registrarTransacao(novaTransacao);
-  SaldoComponent.atualizar();
-  form.reset();
+  catch(erro){
+    alert(erro.message)
+  }
 });
